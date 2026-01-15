@@ -54,9 +54,48 @@ class MainActivity : AppCompatActivity() {
         board[index] = currentPlayer
         button.text = currentPlayer
 
-        // Switch to next player
-        isPlayerXTurn = !isPlayerXTurn
-        updateStatusText()
+        // Check if current player has won
+        if (checkWin()) {
+            gameActive = false
+            // Show winner message (current player just won)
+            statusTextView.text = if (isPlayerXTurn) {
+                getString(R.string.player_x_wins)
+            } else {
+                getString(R.string.player_o_wins)
+            }
+            // Play Again button will be shown in Step 5
+        } else {
+            // Switch to next player
+            isPlayerXTurn = !isPlayerXTurn
+            updateStatusText()
+        }
+    }
+
+    private fun checkWin(): Boolean {
+        // All possible winning combinations (rows, columns, diagonals)
+        val winPositions = arrayOf(
+            intArrayOf(0, 1, 2),  // Top row
+            intArrayOf(3, 4, 5),  // Middle row
+            intArrayOf(6, 7, 8),  // Bottom row
+            intArrayOf(0, 3, 6),  // Left column
+            intArrayOf(1, 4, 7),  // Middle column
+            intArrayOf(2, 5, 8),  // Right column
+            intArrayOf(0, 4, 8),  // Diagonal (top-left to bottom-right)
+            intArrayOf(2, 4, 6)   // Diagonal (top-right to bottom-left)
+        )
+
+        // Check each winning combination
+        for (positions in winPositions) {
+            val first = board[positions[0]]
+            val second = board[positions[1]]
+            val third = board[positions[2]]
+
+            // If all three positions have the same non-null value, it's a win
+            if (first != null && first == second && first == third) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun updateStatusText() {
