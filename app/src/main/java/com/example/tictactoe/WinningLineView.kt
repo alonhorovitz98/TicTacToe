@@ -3,6 +3,7 @@ package com.example.tictactoe
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -13,22 +14,26 @@ class WinningLineView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val paint = Paint().apply {
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.winning_line_green)
-        strokeWidth = 16f
+        strokeWidth = 18f
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
         isAntiAlias = true
-        pathEffect = null
     }
     
-    private val shadowPaint = Paint().apply {
-        color = ContextCompat.getColor(context, R.color.button_shadow)
-        strokeWidth = 20f
+    private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.winning_line_green)
+        strokeWidth = 24f
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
         isAntiAlias = true
+        alpha = 100
     }
+    
+    private val path = Path()
 
     private var winningPositions: IntArray? = null
     private var buttonPositions: Array<Pair<Float, Float>?>? = null
@@ -60,22 +65,16 @@ class WinningLineView @JvmOverloads constructor(
             val endCenter = centers[endPos]
 
             if (startCenter != null && endCenter != null) {
-                // Draw shadow first for depth
-                canvas.drawLine(
-                    startCenter.first + 2f,
-                    startCenter.second + 2f,
-                    endCenter.first + 2f,
-                    endCenter.second + 2f,
-                    shadowPaint
-                )
-                // Draw main line on top
-                canvas.drawLine(
-                    startCenter.first,
-                    startCenter.second,
-                    endCenter.first,
-                    endCenter.second,
-                    paint
-                )
+                // Use Path for smoother rendering
+                path.reset()
+                path.moveTo(startCenter.first, startCenter.second)
+                path.lineTo(endCenter.first, endCenter.second)
+                
+                // Draw glow effect first (wider, semi-transparent)
+                canvas.drawPath(path, glowPaint)
+                
+                // Draw main line on top (crisp and bright)
+                canvas.drawPath(path, paint)
             }
         }
     }

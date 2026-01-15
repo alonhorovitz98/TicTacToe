@@ -65,15 +65,22 @@ class MainActivity : AppCompatActivity() {
         // Set the cell with current player's mark
         val currentPlayer = if (isPlayerXTurn) "X" else "O"
         board[index] = currentPlayer
-        button.text = currentPlayer
-
-        // Set text color: X = red, O = blue
-        val textColor = if (isPlayerXTurn) {
-            ContextCompat.getColor(this, R.color.player_x_red)
+        
+        // Clear text and set drawable instead for crisp rendering
+        button.text = ""
+        val drawable = if (isPlayerXTurn) {
+            ContextCompat.getDrawable(this, R.drawable.ic_x_mark)
         } else {
-            ContextCompat.getColor(this, R.color.player_o_blue)
+            ContextCompat.getDrawable(this, R.drawable.ic_o_mark)
         }
-        button.setTextColor(textColor)
+        
+        // Set drawable size - use 70% of button size for proper scaling
+        button.post {
+            val size = (button.width * 0.7).toInt().coerceAtLeast(60)
+            drawable?.setBounds(0, 0, size, size)
+            button.setCompoundDrawables(drawable, null, null, null)
+            button.compoundDrawablePadding = 0
+        }
 
         // Check if current player has won
         val winningPositions = checkWin()
