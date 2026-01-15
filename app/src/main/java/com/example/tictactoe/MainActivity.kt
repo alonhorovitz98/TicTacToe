@@ -1,9 +1,11 @@
 package com.example.tictactoe
 
 import android.os.Bundle
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttons: Array<Button>
     private lateinit var statusTextView: TextView
     private lateinit var playAgainButton: Button
+    private lateinit var winningLineView: WinningLineView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize UI references
         statusTextView = findViewById(R.id.statusTextView)
         playAgainButton = findViewById(R.id.playAgainButton)
+        winningLineView = findViewById(R.id.winningLineView)
 
         // Initialize buttons array
         buttons = arrayOf(
@@ -38,6 +42,15 @@ class MainActivity : AppCompatActivity() {
                 onButtonClick(it as Button, i)
             }
         }
+
+        // Wait for layout to be drawn before calculating button positions
+        winningLineView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                winningLineView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                // Layout is ready, button positions can now be calculated
+            }
+        })
 
         // Initialize status text
         updateStatusText()
@@ -54,8 +67,17 @@ class MainActivity : AppCompatActivity() {
         board[index] = currentPlayer
         button.text = currentPlayer
 
+        // Set text color: X = red, O = blue
+        val textColor = if (isPlayerXTurn) {
+            ContextCompat.getColor(this, R.color.player_x_red)
+        } else {
+            ContextCompat.getColor(this, R.color.player_o_blue)
+        }
+        button.setTextColor(textColor)
+
         // Check if current player has won
-        if (checkWin()) {
+        val winningPositions = checkWin()
+        if (winningPositions != null) {
             gameActive = false
             // Show winner message (current player just won)
             statusTextView.text = if (isPlayerXTurn) {
@@ -63,6 +85,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 getString(R.string.player_o_wins)
             }
+            // Draw winning line
+            drawWinningLine(winningPositions)
             // Play Again button will be shown in Step 5
         } else {
             // Switch to next player
@@ -71,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkWin(): Boolean {
+    private fun checkWin(): IntArray? {
         // All possible winning combinations (rows, columns, diagonals)
         val winPositions = arrayOf(
             intArrayOf(0, 1, 2),  // Top row
@@ -92,10 +116,37 @@ class MainActivity : AppCompatActivity() {
 
             // If all three positions have the same non-null value, it's a win
             if (first != null && first == second && first == third) {
-                return true
+                return positions
             }
         }
-        return false
+        return null
+    }
+
+    private fun drawWinningLine(winningPositions: IntArray) {
+        // Post to ensure layout is complete before calculating positions
+        winningLineView.post {
+            // Calculate center positions of all buttons relative to winningLineView
+            val buttonCenters = Array<Pair<Float, Float>?>(9) { null }
+            
+            for (i in buttons.indices) {
+                val button = buttons[i]
+                val buttonLocation = IntArray(2)
+                button.getLocationOnScreen(buttonLocation)
+                
+                // Get the position of winningLineView
+                val viewLocation = IntArray(2)
+                winningLineView.getLocationOnScreen(viewLocation)
+                
+                // Calculate center relative to winningLineView
+                val centerX = (buttonLocation[0] - viewLocation[0] + button.width / 2f)
+                val centerY = (buttonLocation[1] - viewLocation[1] + button.height / 2f)
+                
+                buttonCenters[i] = Pair(centerX, centerY)
+            }
+            
+            // Set the winning line
+            winningLineView.setWinningLine(winningPositions, buttonCenters)
+        }
     }
 
     private fun updateStatusText() {

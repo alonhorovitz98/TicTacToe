@@ -5,19 +5,22 @@ plugins {
 
 android {
     namespace = "com.example.tictactoe"
-    compileSdk {
-        version = release(36)
-    }
+
+    // Change this to a standard number to ensure stability
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.tictactoe"
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 35 // Match compileSdk
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    // Explicitly tell Gradle NOT to look for C++ files
+    // If you ever need C++, you would add an 'externalNativeBuild' block here.
 
     buildTypes {
         release {
