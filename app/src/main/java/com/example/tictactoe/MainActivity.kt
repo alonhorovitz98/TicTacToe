@@ -1,6 +1,7 @@
 package com.example.tictactoe
 
 import android.os.Bundle
+import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.TextView
@@ -41,6 +42,11 @@ class MainActivity : AppCompatActivity() {
             buttons[i].setOnClickListener {
                 onButtonClick(it as Button, i)
             }
+        }
+
+        // Set up Play Again button listener
+        playAgainButton.setOnClickListener {
+            resetGame()
         }
 
         // Wait for layout to be drawn before calculating button positions
@@ -94,7 +100,13 @@ class MainActivity : AppCompatActivity() {
             }
             // Draw winning line
             drawWinningLine(winningPositions)
-            // Play Again button will be shown in Step 5
+            // Show Play Again button
+            playAgainButton.visibility = View.VISIBLE
+        } else if (isBoardFull()) {
+            // Draw detection - board is full and no one won
+            gameActive = false
+            statusTextView.text = getString(R.string.draw)
+            playAgainButton.visibility = View.VISIBLE
         } else {
             // Switch to next player
             isPlayerXTurn = !isPlayerXTurn
@@ -127,6 +139,40 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return null
+    }
+
+    private fun isBoardFull(): Boolean {
+        for (i in 0 until 9) {
+            if (board[i] == null) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun resetGame() {
+        isPlayerXTurn = true
+        gameActive = true
+        
+        // Clear board
+        for (i in 0 until 9) {
+            board[i] = null
+        }
+        
+        // Clear all button drawables and text
+        for (button in buttons) {
+            button.text = ""
+            button.setCompoundDrawables(null, null, null, null)
+        }
+        
+        // Clear winning line
+        winningLineView.clearWinningLine()
+        
+        // Reset status text
+        updateStatusText()
+        
+        // Hide Play Again button
+        playAgainButton.visibility = View.GONE
     }
 
     private fun drawWinningLine(winningPositions: IntArray) {
