@@ -7,7 +7,26 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorX">#F44336</color>
-    <color name="colorO">#2196F3</color>
-    <color name="colorWinningLine">#4CAF50</color>
+    
+    <!-- Vibrant game colors -->
+    <color name="player_x_red">#FFFF1744</color>
+    <color name="player_x_red_dark">#FFD50000</color>
+    <color name="player_o_blue">#FF00B0FF</color>
+    <color name="player_o_blue_dark">#FF0091EA</color>
+    <color name="winning_line_green">#FF00E676</color>
+    
+    <!-- Background colors -->
+    <color name="bg_gradient_start">#FF667EEA</color>
+    <color name="bg_gradient_end">#FF764BA2</color>
+    <color name="button_bg_light">#FFF5F5F5</color>
+    <color name="button_bg_dark">#FFE0E0E0</color>
+    <color name="button_shadow">#40000000</color>
+    
+    <!-- Text colors -->
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#FFF5F5F5</color>
+    
+    <!-- Play Again button -->
+    <color name="play_again_bg">#FF00E676</color>
+    <color name="play_again_bg_dark">#FF00C853</color>
 </resources>
