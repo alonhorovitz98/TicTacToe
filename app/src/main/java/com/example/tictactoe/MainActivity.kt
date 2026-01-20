@@ -100,13 +100,17 @@ class MainActivity : AppCompatActivity() {
             }
             // Draw winning line
             drawWinningLine(winningPositions)
-            // Show Play Again button
+            // Show Play Again button clearly on top of other views
             playAgainButton.visibility = View.VISIBLE
+            playAgainButton.bringToFront()
+            playAgainButton.requestLayout()
         } else if (isBoardFull()) {
             // Draw detection - board is full and no one won
             gameActive = false
             statusTextView.text = getString(R.string.draw)
             playAgainButton.visibility = View.VISIBLE
+            playAgainButton.bringToFront()
+            playAgainButton.requestLayout()
         } else {
             // Switch to next player
             isPlayerXTurn = !isPlayerXTurn
